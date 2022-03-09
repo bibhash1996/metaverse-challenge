@@ -1,10 +1,24 @@
 import React, { useRef } from 'react'
 import { ByMoralis, useMoralis, useMoralisQuery } from 'react-moralis'
+import Message from './message'
 import SendMessage from './send-message'
 
 export default function Messages() {
   const { user } = useMoralis()
   const endOfMessageRef = useRef(null)
+  const { data, error, isLoading } = useMoralisQuery(
+    'Messages',
+    (query) =>
+      query
+        .ascending('createdAt')
+        .greaterThan('createdAt', new Date(Date.now() - 1000 * 60 * 15)),
+    [],
+    {
+      live: true,
+    }
+  )
+
+  console.log('Data : ', data)
 
   return (
     <div className="pb-60">
@@ -12,11 +26,27 @@ export default function Messages() {
         <ByMoralis
           style={{ marginLeft: 'auto', marginRight: 'auto' }}
           variant="dark"
-        ></ByMoralis>
+        />
       </div>
 
       {/* Messages */}
-      <div></div>
+      <div>
+        {data.map((_message, index) => (
+          <Message key={_message.id} message={_message} />
+        ))}
+        {/* 
+        {data.map((_message, index) => (
+          <Message key={index} message={_message} />
+        ))}
+
+        {data.map((_message, index) => (
+          <Message key={index} message={_message} />
+        ))}
+
+        {data.map((_message, index) => (
+          <Message key={index} message={_message} />
+        ))} */}
+      </div>
 
       {/* Send message */}
       <div className="flex justify-center">
